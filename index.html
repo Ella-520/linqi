@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>林栖科技 — AI驱动的院外药品商业化</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --g: #1B4332; --gm: #2D6A4F; --gl: #40916C; --gp: #D8F3DC;
+  --a: #B8860B; --al: #FDE68A;
+  --w: #FFFFFF; --bg: #FAFBF7;
+  --g50: #F9FAFB; --g100: #F3F4F6; --g200: #E5E7EB; --g300: #D1D5DB;
+  --t: #1C2B36; --m: #5F6B7A;
+  --r: 12px; --sh: 0 4px 24px rgba(0,0,0,0.06); --shl: 0 12px 48px rgba(0,0,0,0.1);
+  --tr: 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  color: var(--t); background: var(--bg); line-height: 1.7; -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(250,251,247,0.88); backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid transparent; padding: 0 2rem; transition: var(--tr);
+}
+nav.scrolled { border-bottom-color: var(--g200); box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.nav-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.logo { font-size: 1.3rem; font-weight: 800; color: var(--g); letter-spacing: -0.02em; text-decoration: none; }
+.logo span { color: var(--a); }
+.nav-links { display: flex; gap: 2.2rem; list-style: none; }
+.nav-links a {
+  text-decoration: none; color: var(--m); font-size: 0.88rem; font-weight: 600;
+  transition: color var(--tr); position: relative; padding: 0.25rem 0;
+}
+.nav-links a:hover, .nav-links a.active { color: var(--g); }
+.nav-links a::after {
+  content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 2px;
+  background: var(--g); transition: width var(--tr);
+}
+.nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+
+/* ── HERO (compact) ── */
+.hero {
+  min-height: 75vh; display: flex; align-items: center; justify-content: center;
+  padding: 7rem 2rem 3rem; background: linear-gradient(165deg, #E8F5E9 0%, #F0F7F1 35%, var(--bg) 75%);
+  position: relative; overflow: hidden; text-align: center;
+}
+.hero::before {
+  content: ''; position: absolute; top: -15%; right: -8%; width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(27,67,50,0.05) 0%, transparent 70%);
+  border-radius: 50%; pointer-events: none;
+}
+.hero-tag {
+  display: inline-block; padding: 0.3rem 0.9rem;
+  background: rgba(27,67,50,0.07); border: 1px solid rgba(27,67,50,0.12);
+  border-radius: 100px; font-size: 0.8rem; color: var(--gm); font-weight: 600;
+  margin-bottom: 1.5rem; letter-spacing: 0.06em;
+}
+.hero h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); font-weight: 800; color: var(--g); line-height: 1.2; margin-bottom: 1rem; letter-spacing: -0.03em; }
+.hero h1 em { font-style: normal; color: var(--a); }
+.hero p { font-size: 1.1rem; color: var(--m); max-width: 560px; margin: 0 auto; line-height: 1.8; }
+
+/* ── MODULE GRID (overview cards) ── */
+.modules { max-width: 1100px; margin: -3rem auto 4rem; padding: 0 2rem; position: relative; z-index: 2; }
+.modules-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+@media (max-width: 900px) { .modules-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 500px) { .modules-grid { grid-template-columns: 1fr; } }
+
+.mod-card {
+  background: var(--w); border-radius: var(--r); padding: 2rem 1.5rem;
+  box-shadow: var(--sh); cursor: pointer; transition: all var(--tr);
+  border-top: 4px solid transparent; text-decoration: none; display: block;
+  position: relative; overflow: hidden;
+}
+.mod-card:hover { transform: translateY(-4px); box-shadow: var(--shl); }
+.mod-card:nth-child(1) { border-top-color: var(--g); }
+.mod-card:nth-child(2) { border-top-color: var(--a); }
+.mod-card:nth-child(3) { border-top-color: var(--gl); }
+.mod-card:nth-child(4) { border-top-color: var(--g); }
+
+.mod-card .icon { font-size: 2.2rem; display: block; margin-bottom: 1rem; }
+.mod-card h3 { font-size: 1.15rem; color: var(--g); margin-bottom: 0.5rem; }
+.mod-card p { font-size: 0.84rem; color: var(--m); line-height: 1.6; }
+.mod-card .arrow {
+  display: inline-block; margin-top: 1rem; font-size: 0.85rem; color: var(--gm);
+  font-weight: 700; transition: transform var(--tr);
+}
+.mod-card:hover .arrow { transform: translateX(4px); }
+
+/* ── DETAIL SECTIONS ── */
+.detail { padding: 6rem 2rem; }
+.detail:nth-child(even) { background: var(--w); }
+.detail-inner { max-width: 1100px; margin: 0 auto; }
+
+.detail-label {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--gm); margin-bottom: 1rem;
+}
+.detail-label::before { content: ''; width: 24px; height: 2px; background: var(--gm); border-radius: 1px; }
+
+.detail h2 { font-size: clamp(1.7rem, 3.5vw, 2.3rem); font-weight: 800; color: var(--g); margin-bottom: 0.75rem; letter-spacing: -0.02em; }
+.detail-intro { font-size: 1.05rem; color: var(--m); max-width: 640px; line-height: 1.8; margin-bottom: 2.5rem; }
+
+/* ── INSIGHT BOX ── */
+.insight {
+  background: linear-gradient(135deg, var(--g), #1B4D3A); color: var(--w);
+  padding: 2rem 2.5rem; border-radius: var(--r); margin-bottom: 2rem;
+  position: relative; overflow: hidden;
+}
+.insight::after {
+  content: ''; position: absolute; top: -40%; right: -10%; width: 250px; height: 250px;
+  background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%);
+  border-radius: 50%; pointer-events: none;
+}
+.insight h4 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+.insight p { opacity: 0.9; font-size: 0.95rem; line-height: 1.7; }
+
+/* ── STEP CARDS (for journey) ── */
+.step-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+@media (max-width: 800px) { .step-row { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .step-row { grid-template-columns: 1fr; } }
+
+.step-card {
+  background: var(--w); border-radius: var(--r); padding: 1.75rem 1.25rem;
+  box-shadow: var(--sh); text-align: center; border: 1px solid var(--g200);
+  transition: var(--tr);
+}
+.step-card:hover { box-shadow: var(--shl); border-color: transparent; }
+.step-card .sn { font-size: 2.5rem; font-weight: 800; color: var(--gp); line-height: 1; display: block; margin-bottom: 0.5rem; }
+.step-card h4 { font-size: 1.05rem; color: var(--g); margin-bottom: 0.3rem; }
+.step-card .stag { font-size: 0.75rem; color: var(--gm); font-weight: 700; margin-bottom: 0.5rem; display: block; }
+.step-card p { font-size: 0.82rem; color: var(--m); line-height: 1.55; }
+
+/* ── 2-COL CARDS ── */
+.col2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+@media (max-width: 700px) { .col2 { grid-template-columns: 1fr; } }
+
+.col-card {
+  background: var(--w); border-radius: var(--r); padding: 2rem; box-shadow: var(--sh);
+  border-left: 4px solid var(--g);
+}
+.col-card:nth-child(2) { border-left-color: var(--a); }
+.col-card h4 { font-size: 1.1rem; color: var(--g); margin-bottom: 0.3rem; }
+.col-card .tag { font-size: 0.82rem; color: var(--gm); font-weight: 600; margin-bottom: 1rem; display: block; }
+.col-card ul { list-style: none; }
+.col-card li { font-size: 0.88rem; color: var(--m); padding: 0.45rem 0; border-bottom: 1px solid var(--g100); line-height: 1.5; }
+.col-card li:last-child { border-bottom: none; }
+.col-card li::before { content: '→ '; color: var(--gm); font-weight: 700; }
+
+/* ── GEO GRID ── */
+.geo2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+@media (max-width: 600px) { .geo2 { grid-template-columns: 1fr; } }
+
+.geo-item {
+  background: var(--w); border-radius: var(--r); padding: 1.75rem;
+  box-shadow: var(--sh); border: 1px solid var(--g200); transition: var(--tr);
+}
+.geo-item:hover { box-shadow: var(--shl); border-color: transparent; }
+.geo-item .gi { font-size: 1.5rem; display: block; margin-bottom: 0.5rem; }
+.geo-item h4 { font-size: 1rem; color: var(--g); margin-bottom: 0.4rem; }
+.geo-item p { font-size: 0.86rem; color: var(--m); line-height: 1.6; }
+
+/* ── WORKER GRID ── */
+.wk3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+@media (max-width: 700px) { .wk3 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 450px) { .wk3 { grid-template-columns: 1fr; } }
+.wk-card {
+  background: var(--w); border-radius: var(--r); padding: 1.5rem;
+  box-shadow: var(--sh); border: 1px solid var(--g100); transition: var(--tr);
+}
+.wk-card:hover { box-shadow: var(--shl); border-color: transparent; }
+.wk-card h4 { font-size: 1rem; color: var(--g); margin-bottom: 0.35rem; }
+.wk-card p { font-size: 0.82rem; color: var(--m); line-height: 1.6; }
+
+/* ── METRICS BAR ── */
+.metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+@media (max-width: 600px) { .metrics-row { grid-template-columns: repeat(2, 1fr); } }
+.met { text-align: center; padding: 1.25rem; }
+.met .n { font-size: 2.2rem; font-weight: 800; color: var(--g); line-height: 1.2; }
+.met .n .u { font-size: 0.9rem; font-weight: 500; color: var(--m); }
+.met .l { font-size: 0.8rem; color: var(--m); margin-top: 0.25rem; }
+
+/* ── TABLE ── */
+.roi-tbl { max-width: 680px; margin: 0 auto 2rem; }
+.roi-row { display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 0.7rem 1.25rem; border-bottom: 1px solid var(--g200); font-size: 0.9rem; }
+.roi-row.hd { font-weight: 700; color: var(--g); border-bottom: 2px solid var(--g); }
+.roi-row:last-child { border-bottom: none; }
+
+/* ── CAP + PHASE ── */
+.cap-phase { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+@media (max-width: 700px) { .cap-phase { grid-template-columns: 1fr; } }
+
+.cap-box { background: var(--g50); border-radius: var(--r); padding: 1.75rem; border: 1px solid var(--g200); }
+.cap-box h4 { font-size: 1rem; color: var(--g); margin-bottom: 0.75rem; }
+.cap-box li { font-size: 0.88rem; color: var(--m); padding: 0.35rem 0; border-bottom: 1px solid var(--g200); list-style: none; line-height: 1.5; }
+.cap-box li:last-child { border-bottom: none; }
+
+.phase2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+@media (max-width: 600px) { .phase2 { grid-template-columns: 1fr; } }
+.ph-card { background: var(--g50); border-radius: var(--r); padding: 1.5rem; border: 1px solid var(--g200); }
+.ph-card h4 { color: var(--g); font-size: 1rem; margin-bottom: 0.6rem; }
+.ph-card p { font-size: 0.86rem; color: var(--m); line-height: 1.7; }
+
+/* ── FOOTER ── */
+footer { padding: 3rem 2rem; text-align: center; font-size: 0.85rem; color: var(--m); border-top: 1px solid var(--g200); background: var(--w); }
+footer a { color: var(--gm); text-decoration: none; }
+footer .tel { font-size: 1.2rem; font-weight: 700; color: var(--g); margin-top: 0.5rem; display: block; }
+
+/* ── RESPONSIVE NAV ── */
+@media (max-width: 640px) {
+  .nav-links { gap: 1.2rem; }
+  .nav-links a { font-size: 0.8rem; }
+  nav { padding: 0 1rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- NAV -->
+<!-- ═══════════════════════════════════════════ -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="#" class="logo">林<span>栖</span></a>
+    <ul class="nav-links">
+      <li><a href="#chain" data-nav>院外全链路</a></li>
+      <li><a href="#geo" data-nav>GEO</a></li>
+      <li><a href="#workers" data-nav>数字员工</a></li>
+      <li><a href="#about" data-nav>关于我们</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- HERO -->
+<!-- ═══════════════════════════════════════════ -->
+<header class="hero">
+  <div>
+    <span class="hero-tag">AI × 医疗 · 院外商业化</span>
+    <h1>让好药真正到达<em>需要它的人</em>手中</h1>
+    <p>林栖科技 — AI驱动的医生内容、患者服务与销售辅助，为药企构建独立于医院之外的全新商业通路。</p>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- MODULE OVERVIEW CARDS -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="modules">
+  <div class="modules-grid">
+    <a href="#chain" class="mod-card">
+      <span class="icon">🔗</span>
+      <h3>院外全链路</h3>
+      <p>患者端 4 步 + 医生端 + 销售端，从触达到处方的完整闭环。</p>
+      <span class="arrow">了解详情 →</span>
+    </a>
+    <a href="#geo" class="mod-card">
+      <span class="icon">🔍</span>
+      <h3>GEO 生成式引擎优化</h3>
+      <p>AI搜索时代，让你的药在ChatGPT、DeepSeek中被正确引用。</p>
+      <span class="arrow">了解详情 →</span>
+    </a>
+    <a href="#workers" class="mod-card">
+      <span class="icon">🤖</span>
+      <h3>数字员工</h3>
+      <p>患者管家 · 医生智能体 · AI销售顾问 · 合规机器人，AI驱动的运营底座。</p>
+      <span class="arrow">了解详情 →</span>
+    </a>
+    <a href="#about" class="mod-card">
+      <span class="icon">🏢</span>
+      <h3>关于林栖</h3>
+      <p>团队背景 · 已有能力 · 落地节奏 · 合作方式。</p>
+      <span class="arrow">了解详情 →</span>
+    </a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 1: 院外全链路 -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="detail" id="chain">
+  <div class="detail-inner">
+    <span class="detail-label">核心业务 01</span>
+    <h2>新药院外全链路</h2>
+    <p class="detail-intro">传统路径（进医院→上医保→医生开方）越来越窄。我们提供的是一条独立于医院之外的完整商业通路——医生AI内容获客 → 患者社群建立信任 → AI Agent持续服务 → 互联网医院合规处方。</p>
+
+    <div class="insight">
+      <h4>为什么必须全链路一起做</h4>
+      <p>缺的不是任何一个单点能力：电商卖药缺信任，DTP药房缺主动获客，互联网医院缺流量。我们的三端协同打通了"让患者知道 → 让患者信任 → 让患者合规买到"的完整链条。</p>
+    </div>
+
+    <h3 style="color:var(--g);margin:2rem 0 1rem;font-size:1.25rem;">患者端：4步完整旅程</h3>
+
+    <div class="step-row">
+      <div class="step-card">
+        <span class="sn">01</span>
+        <h4>AI医生视频</h4>
+        <span class="stag">全网获客</span>
+        <p>帮医生在全平台做疾病科普视频。AI完成制作+分发，单医生年触达5万+患者，获客成本约4元/次。</p>
+      </div>
+      <div class="step-card">
+        <span class="sn">02</span>
+        <h4>私域社群</h4>
+        <span class="stag">建立信任</span>
+        <p>评论区→微信私域，专业运营+10万患者组织资源。沉淀率3%，获客成本6.7元/人。</p>
+      </div>
+      <div class="step-card">
+        <span class="sn">03</span>
+        <h4>AI Agent</h4>
+        <span class="stag">持续服务</span>
+        <p>用药提醒·指标追踪·复查提醒——填满"两次就诊之间"。复购率从40%提升至65-75%。</p>
+      </div>
+      <div class="step-card">
+        <span class="sn">04</span>
+        <h4>互联网医院</h4>
+        <span class="stag">合规处方</span>
+        <p>在线问诊→电子处方→配送上门。全链路可追溯，数据闭环。</p>
+      </div>
+    </div>
+
+    <div style="text-align:center;padding:1.2rem 2rem;background:var(--gp);border-radius:var(--r);margin-bottom:2.5rem;font-size:0.95rem;color:var(--g);font-weight:600;">
+      漏斗：50万触达 → 3%沉淀1.5万人 → 15%问诊2,250次 → 55%处方1,238张/年 → 复购65-75%
+    </div>
+
+    <h3 style="color:var(--g);margin-bottom:1rem;font-size:1.25rem;">医生端 & 销售端</h3>
+
+    <div class="col2">
+      <div class="col-card">
+        <h4>医生端</h4>
+        <span class="tag">从坐等患者到主动经营</span>
+        <ul>
+          <li>AI帮医生在全网建立专业IP——零额外时间投入</li>
+          <li>医生智能体处理80%常规咨询，复杂转接医生</li>
+          <li>医生获得：品牌 + 精准患者 + 院外收入</li>
+        </ul>
+      </div>
+      <div class="col-card">
+        <h4>销售端：AI销售顾问</h4>
+        <span class="tag">给每个销售配一个"随身MSL"</span>
+        <ul>
+          <li>拜访前：基于医生画像自动生成拜访方案和应对话术</li>
+          <li>拜访后：口头反馈即时归档，管理层实时看板</li>
+          <li>效果：人均覆盖30→120位医生 | 策略迭代2-4周→24小时</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="background:var(--g50);padding:1.5rem 2rem;border-radius:var(--r);border:1px solid var(--g200);font-size:0.9rem;color:var(--m);text-align:center;">
+      <strong style="color:var(--g);">三端协同飞轮：</strong>医生视频→患者关注→社群讨论→数据反馈给销售→销售用"您的社群已有500人"打动医生→医生更愿意合作→更多视频→飞轮自转
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 2: GEO -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="detail" id="geo">
+  <div class="detail-inner">
+    <span class="detail-label">核心业务 02</span>
+    <h2>GEO 生成式引擎优化</h2>
+    <p class="detail-intro">你的患者不搜百度了——他们问ChatGPT、问DeepSeek、问抖音AI。如果你的药在这些AI答案里不存在，它就不存在于患者的认知里。</p>
+
+    <div class="insight">
+      <h4>从 SEO 到 GEO：底层逻辑变了</h4>
+      <p>传统SEO追求"在搜索结果页第1名"；GEO追求的是"在AI生成的答案中被正确引用"。搜索引擎给你一个链接列表，AI引擎给用户一个直接答案——你的药要么在这个答案里，要么不存在。</p>
+    </div>
+
+    <div class="geo2">
+      <div class="geo-item">
+        <span class="gi">📝</span>
+        <h4>AI内容矩阵铺设</h4>
+        <p>为药品建立覆盖全网AI引擎的结构化内容——疾病科普、治疗方案对比、临床数据解读。AI要什么格式，就做成什么格式。</p>
+      </div>
+      <div class="geo-item">
+        <span class="gi">🏛️</span>
+        <h4>权威信号强化</h4>
+        <p>确保临床数据、指南推荐、专家共识被AI正确抓取和引用，而非遗漏或曲解。</p>
+      </div>
+      <div class="geo-item">
+        <span class="gi">📊</span>
+        <h4>持续监测与报告</h4>
+        <p>按月追踪药品在主流AI搜索中的曝光位置、引用频次、表述准确性。</p>
+      </div>
+      <div class="geo-item">
+        <span class="gi">🛡️</span>
+        <h4>竞品防御</h4>
+        <p>竞品在AI搜索中被怎么讨论，我们是否有更全面、更权威的内容出现。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 3: 数字员工 -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="detail" id="workers">
+  <div class="detail-inner">
+    <span class="detail-label">核心业务 03</span>
+    <h2>数字员工</h2>
+    <p class="detail-intro">把重复的交给AI，把判断留给人。按场景定制的AI运营系统，覆盖药企从患者管理到销售执行的每一层。</p>
+
+    <div class="wk3">
+      <div class="wk-card">
+        <h4>🧑‍⚕️ 患者AI管家</h4>
+        <p>用药提醒 · 指标追踪 · 生活方式建议 · 一键转接医生</p>
+      </div>
+      <div class="wk-card">
+        <h4>🩺 医生智能体</h4>
+        <p>处理80%常规咨询 · 训练自医生专业方向 · 自动转接互联网医院</p>
+      </div>
+      <div class="wk-card">
+        <h4>💼 AI销售顾问</h4>
+        <p>拜访方案自动生成 · 拜访后自动复盘归档 · 管理层实时看板</p>
+      </div>
+      <div class="wk-card">
+        <h4>✅ 合规审查机器人</h4>
+        <p>内容发布前自动审核 · 标记违规表述 · 全链路合规可审计</p>
+      </div>
+      <div class="wk-card">
+        <h4>✍️ 医学写作助手</h4>
+        <p>辅助临床研究报告 · 产品专论 · 学术幻灯制作</p>
+      </div>
+      <div class="wk-card">
+        <h4>📑 申报辅助系统</h4>
+        <p>药监局申报材料整理 · 法规对照 · 进度追踪</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 4: 关于我们 -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="detail" id="about">
+  <div class="detail-inner">
+    <span class="detail-label">核心业务 04</span>
+    <h2>关于林栖</h2>
+    <p class="detail-intro">"林栖"——鸟归于林，患者找到可以安心的地方。我们是一个横跨医药、AI、患者运营的复合型团队，致力于让创新药通过AI驱动的院外通路，真正到达需要它们的人手中。</p>
+
+    <!-- 关键数据 -->
+    <h3 style="color:var(--g);margin-bottom:1rem;font-size:1.15rem;">以一个新药、10位合作医生、首年运营为例</h3>
+    <div class="metrics-row">
+      <div class="met"><div class="n">50<span class="u">万</span></div><div class="l">年精准患者触达</div></div>
+      <div class="met"><div class="n">1,238<span class="u">张</span></div><div class="l">年处方量/10位医生</div></div>
+      <div class="met"><div class="n">3.4<span class="u">倍</span></div><div class="l">首年ROI（客单价1万）</div></div>
+      <div class="met"><div class="n">65-75<span class="u">%</span></div><div class="l">AI Agent复购率</div></div>
+    </div>
+
+    <div class="roi-tbl">
+      <div class="roi-row hd"><span>客单价</span><span>首年销售额</span><span>ROI</span></div>
+      <div class="roi-row"><span>3,000元（慢病用药）</span><span>371万</span><span>1.0×</span></div>
+      <div class="roi-row"><span>10,000元（免疫类药）</span><span>1,238万</span><span style="color:var(--gm);font-weight:700">3.4×</span></div>
+      <div class="roi-row"><span>30,000元（高值创新药）</span><span>3,714万</span><span style="color:var(--a);font-weight:700">10.3×</span></div>
+    </div>
+
+    <!-- 团队 + 能力 -->
+    <h3 style="color:var(--g);margin-bottom:1rem;font-size:1.15rem;">团队与已有能力</h3>
+    <div class="cap-phase">
+      <div class="cap-box">
+        <h4>核心团队</h4>
+        <ul>
+          <li>创始人：神经生物学（洛桑联邦理工）+ 管理学（复旦）；前阿斯利康/艾伯维/国控 医学与创新高管</li>
+          <li>CPO/COO：15年产品经验，16项专利；前VIP陪练/咪咕视讯产品总监</li>
+          <li>技术合伙人：上海理工AI方向</li>
+          <li>患者运营：10年患者组织经验，10万活跃用户</li>
+          <li>AI视频：已有成型团队，年框合作</li>
+        </ul>
+      </div>
+      <div class="cap-box">
+        <h4>已具备的基础设施</h4>
+        <ul>
+          <li>互联网医院牌照与合规处方能力</li>
+          <li>医生资源网络（各专科KOL/KOC）</li>
+          <li>10万+患者组织资源</li>
+          <li>AI视频制作 + 全平台分发</li>
+          <li>患者AI Agent + 医生智能体产品</li>
+          <li>AI销售顾问系统开发能力</li>
+          <li>药企高层关系网络</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 落地节奏 -->
+    <h3 style="color:var(--g);margin-bottom:1rem;font-size:1.15rem;">落地节奏</h3>
+    <div class="phase2">
+      <div class="ph-card">
+        <h4>第一阶段（1-2月）POC验证</h4>
+        <p>2-3位医生 + 全平台视频分发<br>搭建专病患者社群<br>AI Agent基础版上线<br>跑通"视频→社群→处方"<br><strong>预算：60-80万</strong></p>
+      </div>
+      <div class="ph-card">
+        <h4>第二阶段（3-6月）规模扩展</h4>
+        <p>医生扩展至10-15位<br>医生智能体 + AI销售顾问上线<br>社群3,000-5,000人<br>月均处方300-500张<br><strong>预算：100-150万</strong></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- FOOTER -->
+<!-- ═══════════════════════════════════════════ -->
+<footer>
+  <p>© 2026 上海林栖科技有限公司 · 院外全链路 · GEO · 数字员工</p>
+  <span class="tel">📱 13052290879</span>
+</footer>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- JS -->
+<!-- ═══════════════════════════════════════════ -->
+<script>
+// Nav scroll effect
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// Active nav highlight
+const navLinks = document.querySelectorAll('[data-nav]');
+const sections = [...navLinks].map(a => document.querySelector(a.getAttribute('href')));
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(a => a.classList.remove('active'));
+      const active = document.querySelector(`[data-nav][href="#${e.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { rootMargin: '-30% 0px -60% 0px' });
+
+sections.forEach(s => observer.observe(s));
+
+// Fade-in animation
+const fadeEls = document.querySelectorAll('.step-card, .col-card, .geo-item, .wk-card, .cap-box, .ph-card, .insight');
+const fadeObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+fadeEls.forEach(el => {
+  el.style.opacity = '0';
+  el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+  el.style.transform = 'translateY(20px)';
+  fadeObs.observe(el);
+});
+</script>
+
+</body>
+</html>
